@@ -1,0 +1,345 @@
+---
+title: "Chapter 4 - Distributions of Random Variables"
+author: "Subhalaxmi Rout"
+output:
+  pdf_document:
+    extra_dependencies:
+    - geometry
+    - multicol
+    - multirow
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Area under the curve, Part I**. (4.1, p. 142) What percent of a standard normal distribution $N(\mu=0, \sigma=1)$ is found in each region? Be sure to draw a graph.
+
+(a) $Z < -1.35$
+(b) $Z > 1.48$
+(c) $-0.4 < Z < 1.5$
+(d) $|Z| > 2$
+
+```{r, echo=FALSE}
+# use the DATA606::normalPlot function
+```
+### ** Answer **      
+
+(a) $Z < -1.35$
+```{r}
+library("DATA606")
+mean = 0
+sd = 1
+area <- pnorm(-1.35, mean=0, sd=1)
+area
+normalPlot(mean = 0, sd = 1,bounds = c(-Inf,-1.35), tails = F)
+paste("Z < -1.35 area under curve is 8.85%")
+```
+
+(b) $Z > 1.48$
+```{r}
+area <- 1 - pnorm(1.48, mean=0, sd=1)
+area
+normalPlot(mean = 0, sd = 1,bounds = c(1.48, Inf), tails = F)
+paste("Z > 1.48 area under the curve is 6.94%")
+```
+(c) $-0.4 < Z < 1.5$
+```{r}
+area1 <- pnorm(-0.4, mean=0, sd=1) 
+area2 <- 1 - pnorm(1.5, mean=0, sd=1)
+area <- 1-(area1 + area2)
+area 
+normalPlot(mean = 0, sd = 1,bounds = c(-0.4, 1.5), tails = F)
+paste("-0.4 < Z < 1.5 area under the curve is 58.86%")
+```
+ (d) $|Z| > 2$
+```{r}
+area1 <- pnorm(-2, mean=0, sd=1) 
+area2 <- 1 - pnorm(2, mean=0, sd=1)
+area <- area1 + area2
+area
+normalPlot(mean = 0, sd = 1,bounds = c(-2, 2), tails = T)
+paste("|Z| > 2 area under the curve is 4.55%")
+```
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Triathlon times, Part I** (4.4, p. 142) In triathlons, it is common for racers to be placed into age and gender groups. Friends Leo and Mary both completed the Hermosa Beach Triathlon, where Leo competed in the *Men, Ages 30 - 34* group while Mary competed in the *Women, Ages 25 - 29* group. Leo completed the race in 1:22:28 (4948 seconds), while Mary completed the race in 1:31:53 (5513 seconds). Obviously Leo finished faster, but they are curious about how they did within their respective groups. Can you help them? Here is some information on the performance of their groups:
+
+* The finishing times of the \textit{Men, Ages 30 - 34} group has a mean of 4313 seconds with a standard deviation of 583 seconds.
+* The finishing times of the \textit{Women, Ages 25 - 29} group has a mean of 5261 seconds with a standard deviation of 807 seconds.
+* The distributions of finishing times for both groups are approximately Normal.
+
+Remember: a better performance corresponds to a faster finish.
+
+(a) Write down the short-hand for these two normal distributions.
+(b) What are the Z-scores for Leo's and Mary's finishing times? What do these Z-scores tell you?
+(c) Did Leo or Mary rank better in their respective groups? Explain your reasoning.
+(d) What percent of the triathletes did Leo finish faster than in his group?
+(e) What percent of the triathletes did Mary finish faster than in her group?
+(f) If the distributions of finishing times are not nearly normal, would your answers to parts (b) - (e) change? Explain your reasoning.
+
+### ** Answer **
+
+```
+(a) Men = N(mu = 4313, sigma = 583)
+    Women = N(mu = 5261, sigma = 807)
+```
+(b)
+```{r}
+leo_X <- 4948
+leo_Mu <- 4314
+leo_sd <- 583
+leo_z <- (leo_X - leo_Mu) / leo_sd
+paste0("Leo's z score is: ",leo_z)
+paste("Leo's finish time is 1.087 sd above the mean.")
+
+mary_X <- 5513
+mary_Mu <- 5261
+mary_sd <- 807
+mary_z <- (mary_X - mary_Mu) / mary_sd
+paste0("Mary's z score is: ",mary_z)
+paste("Mary's finish time is 0.312 sd above the mean.")
+```
+```
+(c) Mary did better in her group because Mary's finish average time is faster than women group. 
+But, finish average time of Leo, slower than men group.
+```
+(d)
+```{r}
+1 - pnorm(leo_z)
+paste("13.84 percent of the triathletes finish slower than Leo in his group.")
+```
+
+(e)
+```{r}
+1 - pnorm(mary_z)
+paste("37.74 percent of the triathletes finish slower than Mary in her group.")
+```
+```
+(f) If the distribution of finishing time is not normal, then 
+we cannot use pnorm to calculate (b),(d), and (e). I think (c)
+wo not change because this is calculate based on average finish time.
+```
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Heights of female college students** Below are heights of 25 female college students.
+
+\[ \stackrel{1}{54}, \stackrel{2}{55}, \stackrel{3}{56}, \stackrel{4}{56}, 
+\stackrel{5}{57}, \stackrel{6}{58}, \stackrel{7}{58}, \stackrel{8}{59}, 
+\stackrel{9}{60}, \stackrel{10}{60}, \stackrel{11}{60}, \stackrel{12}{61}, 
+\stackrel{13}{61}, \stackrel{14}{62}, \stackrel{15}{62}, \stackrel{16}{63}, 
+\stackrel{17}{63}, \stackrel{18}{63}, \stackrel{19}{64}, \stackrel{20}{65}, 
+\stackrel{21}{65}, \stackrel{22}{67}, \stackrel{23}{67}, \stackrel{24}{69}, 
+\stackrel{25}{73} \]
+
+(a) The mean height is 61.52 inches with a standard deviation of 4.58 inches. Use this information to determine if the heights approximately follow the 68-95-99.7% Rule.
+(b) Do these data appear to follow a normal distribution? Explain your reasoning using the graphs provided below.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.show="hold", out.width="50%", fig.height=3}
+library(openintro)
+heights <- c(54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 
+            61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73)
+par(mar=c(3.7,2.2,1,1), las=1, mgp=c(2.5,0.7,0), mfrow = c(1,1), cex.lab = 1.5, cex.axis = 1.5)
+histPlot(heights, col = COL[1], xlab = "Heights", ylab = "", probability = TRUE, axes = FALSE, ylim = c(0,0.085))
+axis(1)
+x <- heights
+xfit <- seq(min(x)-5, max(x)+5, length = 400)
+yfit <- dnorm(xfit, mean = mean(x), sd = sd(x))
+lines(xfit, yfit, col = COL[4], lwd = 2)
+par(mar=c(3.7,3.7,1,1), las=1, mgp=c(2.5,0.7,0), mfrow = c(1,1), cex.lab = 1.5, cex.axis = 1.5)
+qqnorm(heights, col = COL[1], pch = 19, main = "", axes = FALSE)
+axis(1)
+axis(2)
+qqline(heights, col = COL[1])
+```
+
+### ** Answer **
+(a)
+```{r}
+# Use the DATA606::qqnormsim function
+height <- c(54,55,56,56,57,58,58,59,60,60,60,61,61,62,62,63,63,63,64,65,65,67,67,69,73)
+#summary(height)
+
+mean <- mean(height)
+sd <- sd(height)
+
+#68-95-99.7% Rule
+
+sd_1 <- height[which(height < mean + sd & height > mean - sd)]
+sd_1 <- length(sd_1)/length(height)
+sd_1
+paste0(sd_1*100," % of the data fall within 1 standard deviation.")
+
+sd_2 <- height[which(height < mean + 2*sd & height > mean - 2*sd)]
+sd_2 <- length(sd_2)/length(height)
+sd_2
+paste0(sd_2*100," % of the data fall within 2 standard deviation.")
+
+sd_3 <- height[which(height < mean + 3*sd & height > mean - 3*sd)]
+sd_3 <- length(sd_3)/length(height)
+sd_3
+paste0(sd_3*100," % of the data fall within 3 standard deviation.")
+```
+
+(b)
+```{r}
+qqnormsim(height)
+paste("The QQPlot shows normal distribution because most data are on the central line")
+```
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Defective rate.** (4.14, p. 148) A machine that produces a special type of transistor (a component of computers) has a 2% defective rate. The production is considered a random process where each transistor is independent of the others.
+
+(a) What is the probability that the 10th transistor produced is the first with a defect?
+(b) What is the probability that the machine produces no defective transistors in a batch of 100?
+(c) On average, how many transistors would you expect to be produced before the first with a defect? What is the standard deviation?
+(d) Another machine that also produces transistors has a 5% defective rate where each transistor
+is produced independent of the others. On average how many transistors would you expect to be produced with this machine before the first with a defect? What is the standard deviation?
+(e) Based on your answers to parts (c) and (d), how does increasing the probability of an event affect the mean and standard deviation of the wait time until success?
+
+### ** Answer **
+
+(a)
+```{r}
+defect <- 0.02
+success <- (1-defect)
+trials <- 10
+prob <- ((success) ^ (10-1)) * defect
+paste0("The probability that the 10th transistor produced is the first with a defect is ", prob)
+```
+
+(b)
+```{r}
+trails <- 100
+prob <- ((success) ^ (100))
+paste0("The probability that the machine produces no defective transistors in a batch of 100 is ",prob)
+```
+
+(c)
+```{r}
+avg <- 1/defect
+paste0("Average is ", avg)
+mean <- avg
+sd <- sqrt((success)/((defect)^2))
+paste0("standard deviation is ",sd)
+```
+
+(d)
+```{r}
+defect <- 0.05
+success <- 1 - 0.05
+prob <- 1/defect
+paste0(prob," transistors would expect to be produced with this machine before the first with a defect.")
+sd <- sqrt((success)/((defect)^2))
+paste0("standard deviation is ",sd)
+```
+
+(e)
+```
+If the defect rate of probability will increase then standard deviation and mean will decrease.
+```
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Male children.** While it is often assumed that the probabilities of having a boy or a girl are the same, the actual probability of having a boy is slightly higher at 0.51. Suppose a couple plans to have 3 kids.
+
+(a) Use the binomial model to calculate the probability that two of them will be boys.
+(b) Write out all possible orderings of 3 children, 2 of whom are boys. Use these scenarios to calculate the same probability from part (a) but using the addition rule for disjoint outcomes. Confirm that your answers from parts (a) and (b) match.
+(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).
+
+### ** Answer **
+
+(a)
+```{r}
+p <- 0.51
+failure <- 1 - 0.51
+n <- 3
+k <- 2
+
+success_boy <- choose(3,2) * (p)^2 * failure
+paste0("The probability that two of them will be boys in 3 children is ",success_boy*100,"%")
+```
+
+(b)
+```{r}
+#3 children ordering
+# Boy Boy Girl
+# Boy Girl Boy
+# Girl Boy Boy
+boy <- 0.51
+girl <- 1 - boy
+
+p1 <- boy * boy * girl
+p2 <- boy * girl * boy
+p3 <- girl * boy * boy
+
+total <- p1 + p2 +p3
+paste0("So probability of boys is ", total * 100, "%")
+```
+
+(c)
+```
+Calculate probability of a couple who plan to have 8 kids will have 3 boys, 
+will be tedious if we follow (b), because we have to write  56 condition.
+So if we do follow (a) then we can apply direct formula.
+```
+
+```{r}
+choose(8,3)
+```
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Serving in volleyball.** (4.30, p. 162) A not-so-skilled volleyball player has a 15% chance of making the serve, which involves hitting the ball so it passes over the net on a trajectory such that it will land in the opposing team's court. Suppose that her serves are independent of each other.
+
+(a) What is the probability that on the 10th try she will make her 3rd successful serve?
+(b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
+(c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for this discrepancy?
+
+### ** Answer **
+
+(a)
+```{r}
+serve_success <- 0.15
+serve_failure <- 1 - 0.15
+serve_prob <- choose(9,2) * ((serve_success) ^ 3) * ((serve_failure) ^ 7)
+paste0("The probability of 10th try she will make her 3rd successful serve ",serve_prob)
+```
+
+(b)
+```
+Due to all serves are independent, the probability of her 10th serve 
+will be successful is 0.15.
+```
+
+(c)
+```
+In (a) we calculate marginal probability of success but in (b) we calculate
+conditional probability based on previous scinario. 
+```
+
+
+
